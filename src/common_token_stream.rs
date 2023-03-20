@@ -179,13 +179,50 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
 
         return i;
     }
-    //
+
     //    fn previous_token_on_channel(&self, i: isize, channel: isize) -> int { unimplemented!() }
-    //
-    //    fn get_hidden_tokens_to_right(&self, tokenIndex: isize, channel: isize) -> Vec<Token> { unimplemented!() }
-    //
-    //    fn get_hidden_tokens_to_left(&self, tokenIndex: isize, channel: isize) -> Vec<Token> { unimplemented!() }
-    //
+
+    /// Returns all tokens on the specified channel to the right of the current token until a token
+    /// on the default channel is found.
+    pub fn get_hidden_tokens_to_right(
+        &self,
+        token_index: isize,
+        channel: isize,
+    ) -> Vec<&<<Self as TokenStream<'input>>::TF as TokenFactory<'input>>::Tok> {
+        if token_index <= 0 {
+            return Vec::new();
+        }
+        self.base.tokens[((token_index + 1) as usize)..]
+            .iter()
+            .take_while(|&token| {
+                let token = token.borrow();
+                token.get_channel() == channel
+            })
+            .collect()
+    }
+
+    /// Returns all tokens on the specified channel to the left of the current token until a token
+    /// on the default channel is found.
+    pub fn get_hidden_tokens_to_left(
+        &self,
+        token_index: isize,
+        channel: isize,
+    ) -> Vec<&<<Self as TokenStream<'input>>::TF as TokenFactory<'input>>::Tok> {
+        if token_index <= 0 {
+            return Vec::new();
+        }
+        let mut tokens_on_channel = self.base.tokens[..(token_index as usize)]
+            .iter()
+            .rev()
+            .take_while(|&token| {
+                let token = token.borrow();
+                token.get_channel() == channel
+            })
+            .collect::<Vec<_>>();
+        tokens_on_channel.reverse();
+        tokens_on_channel
+    }
+
     //    fn filter_for_channel(&self, left: isize, right: isize, channel: isize) -> Vec<Token> { unimplemented!() }
     //
     //    fn get_source_name(&self) -> String { unimplemented!() }
