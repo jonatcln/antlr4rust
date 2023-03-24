@@ -161,23 +161,18 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
 
     //todo make this const generic over direction
     fn next_token_on_channel(&mut self, mut i: isize, channel: isize, direction: isize) -> isize {
-        self.sync(i);
-        if i >= self.size() {
-            return self.size() - 1;
-        }
-
-        let mut token = self.base.tokens[i as usize].borrow();
-        while token.get_channel() != channel {
-            if token.get_token_type() == EOF || i < 0 {
+        while i >= 0 {
+            self.sync(i);
+            if i >= self.size() {
+                return self.size() - 1;
+            }
+            let token = self.base.tokens[i as usize].borrow();
+            if token.get_channel() == channel || token.get_token_type() == EOF {
                 return i;
             }
-
             i += direction;
-            self.sync(i);
-            token = self.base.tokens[i as usize].borrow();
         }
-
-        return i;
+        return -1;
     }
 
     //    fn previous_token_on_channel(&self, i: isize, channel: isize) -> int { unimplemented!() }
