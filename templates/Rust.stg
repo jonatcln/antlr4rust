@@ -271,6 +271,9 @@ where
         }
     }
 
+    pub fn into_base_parser(self) -> BaseParserType\<'input, I> {
+        self.base
+    }
 }
 
 type DynStrategy\<'input,I> = Box\<dyn ErrorStrategy\<'input,BaseParserType\<'input,I>\> + 'input>;
