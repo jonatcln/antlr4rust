@@ -162,8 +162,7 @@ impl<'input, T: TokenSource<'input>> CommonTokenStream<'input, T> {
     //todo make this const generic over direction
     fn next_token_on_channel(&mut self, mut i: isize, channel: isize, direction: isize) -> isize {
         while i >= 0 {
-            self.sync(i);
-            if i >= self.size() {
+            if !self.sync(i) {
                 return self.size() - 1;
             }
             let token = self.base.tokens[i as usize].borrow();

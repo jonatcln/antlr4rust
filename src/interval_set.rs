@@ -105,6 +105,16 @@ impl IntervalSet {
         }
     }
 
+    pub fn iter(&self) -> impl Iterator<Item = isize> + '_ {
+        self.intervals
+            .iter()
+            .flat_map(|interval| interval.a..=interval.b)
+    }
+
+    pub fn intervals(&self) -> impl Iterator<Item = &Interval> {
+        self.intervals.iter()
+    }
+
     pub fn get_min(&self) -> Option<isize> {
         self.intervals.first().map(|x| x.a)
     }
